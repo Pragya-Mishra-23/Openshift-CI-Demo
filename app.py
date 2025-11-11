@@ -1,1 +1,1 @@
-print("Hello from OpenShift CI Pipeline!");
+print("Hello from OpenShift CI Pipeline!")

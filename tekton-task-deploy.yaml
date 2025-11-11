@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: oc-deploy
+spec:
+  params:
+    - name: DEPLOY_MANIFEST
+      type: string
+      default: /workspace/source/openshift/deployment.yaml
+    - name: IMAGE
+      type: string
+  workspaces:
+    - name: source
+  steps:
+    - name: deploy
+      image: quay.io/openshift/origin-cli:4.12
+      script: |
+        sed -i "s|IMAGE_PLACEHOLDER|$(params.IMAGE)|g" $(params.DEPLOY_MANIFEST)
+        oc apply -f $(params.DEPLOY_MANIFEST)

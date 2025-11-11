@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: python-test
+spec:
+  workspaces:
+    - name: source
+  steps:
+    - name: test
+      image: python:3.11-slim
+      workingDir: /workspace/source
+      script: |
+        pip install pytest
+        pytest --maxfail=1 -q

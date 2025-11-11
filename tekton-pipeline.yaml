@@ -1,0 +1,44 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: ci-pipeline
+spec:
+  params:
+    - name: IMAGE
+      type: string
+  workspaces:
+    - name: source
+  tasks:
+    - name: lint
+      taskRef:
+        name: python-lint
+      workspaces:
+        - name: source
+          workspace: source
+    - name: test
+      runAfter: [lint]
+      taskRef:
+        name: python-test
+      workspaces:
+        - name: source
+          workspace: source
+    - name: build
+      runAfter: [test]
+      taskRef:
+        name: build-and-push-image
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+      workspaces:
+        - name: source
+          workspace: source
+    - name: deploy
+      runAfter: [build]
+      taskRef:
+        name: oc-deploy
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+      workspaces:
+        - name: source
+          workspace: source
